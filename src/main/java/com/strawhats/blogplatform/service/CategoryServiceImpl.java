@@ -104,7 +104,7 @@ public class CategoryServiceImpl implements CategoryService {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
 
         String pattern = "%" + keyword + "%";
-        Page<Category> categoryPage = categoryRepository.findAllByCategoryNameLike(pattern);
+        Page<Category> categoryPage = keyword != null ? categoryRepository.findAllByCategoryNameLike(pattern, pageable) : categoryRepository.findAll(pageable);
 
         List<CategoryDTO> content = categoryPage
                 .stream()

@@ -7,6 +7,7 @@ import com.strawhats.blogplatform.model.User;
 import com.strawhats.blogplatform.payload.UserDTO;
 import com.strawhats.blogplatform.repository.RoleRepository;
 import com.strawhats.blogplatform.repository.UserRepository;
+import com.strawhats.blogplatform.security.jwt.JwtUtils;
 import com.strawhats.blogplatform.security.request.RegisterRequest;
 import com.strawhats.blogplatform.security.response.JwtResponse;
 import com.strawhats.blogplatform.security.service.UserDetailsImpl;
@@ -35,6 +36,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
     private final AuthenticationManager authenticationManager;
+    private final JwtUtils jwtUtils;
 
     @Override
     public UserDTO signUp(RegisterRequest registerRequest) {
@@ -78,6 +80,10 @@ public class AuthServiceImpl implements AuthService {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
         JwtResponse jwtResponse = new JwtResponse();
+
+        String jwtToken = jwtUtils.generateJwtTokenFromUsername(userDetails.getUsername());
+        jwtResponse.setToken(jwtToken);
+
         jwtResponse.setUserId(userDetails.getUserId());
         jwtResponse.setUsername(userDetails.getUsername());
         jwtResponse.setEmail(userDetails.getEmail());

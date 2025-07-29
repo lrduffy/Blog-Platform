@@ -104,7 +104,7 @@ public class UserServiceImpl implements UserService {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
 
         String pattern = '%' + username + '%';
-        Page<User> userPage = userRepository.findAllByUsernameLike(pattern);
+        Page<User> userPage = username != null ? userRepository.findAllByUsernameLike(pattern, pageable) : userRepository.findAll(pageable);
 
         List<UserDTO> content = userPage
                 .stream()
@@ -128,7 +128,7 @@ public class UserServiceImpl implements UserService {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
 
         String pattern = '%' + email + '%';
-        Page<User> userPage = userRepository.findAllByEmailLike(email);
+        Page<User> userPage = email != null ? userRepository.findAllByEmailLike(email, pageable) : userRepository.findAll(pageable);
 
         List<UserDTO> content = userPage
                 .stream()

@@ -88,17 +88,16 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.exceptionHandling(httpSecurityExceptionHandlingConfigurer ->
-                    httpSecurityExceptionHandlingConfigurer.authenticationEntryPoint(jwtEntryPoint)
-                ).cors(httpSecurityCorsConfigurer ->
-                    httpSecurityCorsConfigurer.disable()
-                ).sessionManagement(sessionManagement ->
-                    sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                ).headers(
-                        httpSecurityHeaders -> httpSecurityHeaders.frameOptions(frameOptionsConfig ->
-                                    frameOptionsConfig.sameOrigin()
-                                )
-        ).authorizeHttpRequests(httpSecurityAuthorizeRequests ->
+        http.headers(httpSecurityHeadersConfigurer -> httpSecurityHeadersConfigurer.frameOptions(
+                        frameOptionsConfig -> frameOptionsConfig.sameOrigin()
+                )).csrf(httpSecurityCsrfConfigurer ->
+                        httpSecurityCsrfConfigurer.disable())
+                .sessionManagement(httpSecuritySessionManagementConfigurer ->
+                        httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(httpSecurityExceptionHandlingConfigurer ->
+                        httpSecurityExceptionHandlingConfigurer.authenticationEntryPoint(jwtEntryPoint))
+                .authenticationProvider(authenticationProvider())
+                .authorizeHttpRequests(httpSecurityAuthorizeRequests ->
                         httpSecurityAuthorizeRequests.requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers("/v3/api-docs/**").permitAll()
                                 .requestMatchers("/api/public/**").permitAll()
@@ -107,13 +106,7 @@ public class SecurityConfig {
                                 .requestMatchers("/images/**").permitAll()
                                 .requestMatchers("/h2-console/**").permitAll()
                                 .anyRequest().authenticated()
-                ).formLogin(httpSecurityFormLoginConfigurer ->
-                    httpSecurityFormLoginConfigurer.disable()
-                ).httpBasic(httpBasicConfigurer ->
-                    httpBasicConfigurer.disable()
-                ).addFilterBefore(
-                        jwtFilter, UsernamePasswordAuthenticationFilter.class
-        );
+                ).addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
